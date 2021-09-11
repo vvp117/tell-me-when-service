@@ -1,4 +1,5 @@
 {% extends 'main/base.html' %}
+{% load tz %}
 
 {% block content %}
     {% comment %} <h1>Devices</h1> {% endcomment %}
@@ -10,8 +11,10 @@
             {{ device.name }} ({{ device.id }})
         </div>
         <div class="card-body">
-            <h5 class="card-title">{{ device.type }}</h5>
-            <p class="card-text">{{ device.descr }}.</p>
+            <p class="card-text">{{ device.description }}</p>
+            {% localtime on %}
+            <small class="card-text">Created: {{ device.create_date|date:"F d, Y (H:i O)" }}</small>
+            {% endlocaltime %}
             {% comment %} <a href="#" class="btn btn-primary">Go somewhere</a> {% endcomment %}
         </div>
     </div>

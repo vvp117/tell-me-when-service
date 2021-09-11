@@ -22,6 +22,7 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='main-index'),
+    path('timezone/', views.timezone, name='main-timezone'),
     path('about/', views.about, name='main-about'),
     path('devices/', include('apps.devices.urls'), name='devices-list')
 ]
