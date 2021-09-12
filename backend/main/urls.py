@@ -24,5 +24,6 @@ urlpatterns = [
     path('', views.home, name='main-index'),
     path('timezone/', views.timezone, name='main-timezone'),
     path('about/', views.about, name='main-about'),
-    path('devices/', include('apps.devices.urls'), name='devices-list')
+    path('devices/', include('apps.devices.urls'), name='devices-list'),
+    path('users/', include('apps.users.urls'), name='users-root'),
 ]

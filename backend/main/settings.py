@@ -37,7 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # 'widget_tweaks',
+    'crispy_forms',
     'apps.devices.apps.DevicesConfig',
+    'apps.users.apps.UsersConfig',
 ]
 
 MIDDLEWARE = [
@@ -67,6 +70,9 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'libraries':{
+                'main.customized_tags': 'main.templatetags.customized_tags',
+            },
         },
     },
 ]
@@ -126,9 +132,10 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_URL = '/static/'
-# STATIC_URL = '/home/vvp/work/tell-me-when-service/project/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'

@@ -1,0 +1,44 @@
+{% extends 'main/base.html' %}
+
+{% load crispy_forms_tags %}
+{% comment %}
+{% load widget_tweaks %}
+{% load main.customized_tags %}
+{% endcomment %}
+
+{% block content %}
+
+    <div>
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-3">Sign Up</legend>
+                {% comment %}
+                {% for field in form %}
+                    <div class="mb-3">
+                        {{ field|render_label:"form-label" }}
+                        {{ field|add_class:"form-control"|set_aria_describedby }}
+                        <div id="{{ field|get_aria_describedby }}" class="form-text">
+                            {{ field.help_text }}
+                        </div>
+                    </div>
+                {% endfor %}
+                {% endcomment %}
+                {{ form|crispy }}
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary mb-1 mt-2">Sign Up</button>
+                </div>
+            </fieldset>
+
+            <div class="border-top pt-3">
+                <small class="text-muted">
+                    Already have an Account?
+                    <a href="#" class="ml-2">Sign In</a>
+                </small>
+            </div>
+
+        </form>
+    </div>
+
+{% endblock content %}
