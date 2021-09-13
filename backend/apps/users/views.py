@@ -12,10 +12,11 @@ def register(request: WSGIRequest):
         if form.is_valid():
             form.save()
 
-            username = form.cleaned_data.get('username')
-            messages.success(request, f'Account created for {username}')
+            messages.success(request,
+                f'Your account has been created!'
+                ' You are now able to log in...')
 
-            return redirect('main-index')
+            return redirect('users-login')
 
     else:
         form = UserRegisterForm()
