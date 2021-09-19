@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.core.handlers.wsgi import WSGIRequest
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 from .forms import UserRegisterForm
 
@@ -22,3 +23,8 @@ def register(request: WSGIRequest):
         form = UserRegisterForm()
 
     return render(request, 'users/register.html', {'form': form})
+
+
+@login_required
+def profile(request: WSGIRequest):
+    return render(request, 'users/profile.html')
