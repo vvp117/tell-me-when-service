@@ -1,0 +1,38 @@
+{% extends 'main/base.html' %}
+{% load tz %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+    <article class="card">
+        <div class="card-header">
+            <h3>{{ device.name }} ({{ device.id }})</h3>
+        </div>
+        <div class="card-body">
+            <p class="card-text">{{ device.description }}</p>
+            {% comment %} <a href="#" class="btn btn-primary">Go somewhere</a> {% endcomment %}
+        </div>
+        <div class="card-footer text-muted">
+            {% localtime on %}
+            <div><small class="card-text">Owner: {{ device.owner }}</small></div>
+            <div><small class="card-text">Created: {{ device.create_date|date:"F d, Y (H:i O)" }}</small></div>
+            <div><small class="card-text">Modified: {{ device.modified_date|date:"F d, Y (H:i O)" }}</small></div>
+            {% endlocaltime %}
+        </div>
+    </article>
+
+    <div class="btn-toolbar mt-2" role="toolbar">
+        <div class="btn-group mr-2" role="group">
+            <a class="btn btn-sm btn-primary" href="{% url 'devices-edit' device.pk %}">Edit</a>
+        </div>
+        <div class="btn-group mr-2" role="group">
+            <a class="btn btn-sm btn-danger" href="{% url 'devices-del' device.pk %}">Delete</a>
+        </div>
+        <div class="btn-group mr-2" role="group">
+            <a class="btn btn-sm btn-secondary" href="{% url 'devices-list' %}">Close</a>
+        </div>
+    </div>
+
+{% endblock content %}
+

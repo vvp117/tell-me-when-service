@@ -1,23 +1,31 @@
 {% extends 'main/base.html' %}
 {% load tz %}
-
 {% block content %}
-    {% comment %} <h1>Devices</h1> {% endcomment %}
+
     {% for device in devices %}
 
-    </p>
-    <div class="card">
-        <div class="card-header">
-            {{ device.name }} ({{ device.id }})
+        <div class="card mb-2">
+            <div class="card-header">
+                <a href="{% url 'devices-item' device.id %}">{{ device.name }} ({{ device.id }})</a>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ device.description }}</p>
+            </div>
+            <div class="card-footer text-muted">
+                {% localtime on %}
+                <div>
+                    <small class="card-text">Created: {{ device.owner }} {{ device.create_date|date:"F d, Y H:i"}}</small>
+                </div>
+                {% endlocaltime %}
+            </div>
         </div>
-        <div class="card-body">
-            <p class="card-text">{{ device.description }}</p>
-            {% localtime on %}
-            <small class="card-text">Created: {{ device.create_date|date:"F d, Y (H:i O)" }}</small>
-            {% endlocaltime %}
-            {% comment %} <a href="#" class="btn btn-primary">Go somewhere</a> {% endcomment %}
+
+    {% endfor %}
+
+    <div class="btn-toolbar mt-2" role="toolbar" aria-label="Toolbar with button groups">
+        <div class="btn-group mr-2" role="group" aria-label="First group">
+            <a class="btn btn-primary" href="{% url 'devices-new' %}">Create</a>
         </div>
     </div>
 
-    {% endfor %}
 {% endblock content %}

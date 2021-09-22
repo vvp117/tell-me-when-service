@@ -1,0 +1,23 @@
+{% extends 'main/base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+    <div>
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-3">Add device</legend>
+                {{ form|crispy }}
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary mb-1 mt-2">Save</button>
+                    {% if device.pk %}
+                        <a class="btn btn-secondary mb-1 mt-2" href="{% url 'devices-item' device.pk %}">Cancel</a>
+                    {% endif %}
+                </div>
+            </fieldset>
+        </form>
+    </div>
+
+{% endblock content %}
