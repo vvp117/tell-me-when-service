@@ -30,7 +30,7 @@ class DeviceListView(LoginReq, ListView):
     model = Device
     template_name = 'devices/device_list.html'  # <app/<model>_<viewtype>.html
     context_object_name = 'devices'
-    paginate_by = 3
+    paginate_by = 5
     # ordering = ['-create_date']
 
     def get_queryset(self):
