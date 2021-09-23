@@ -1,4 +1,4 @@
-from django.shortcuts import render
+# from django.shortcuts import render
 from django.contrib.auth.mixins import (
     LoginRequiredMixin as LoginReq,
     UserPassesTestMixin as UserPass,
@@ -13,12 +13,12 @@ from django.views.generic import (
 from .models import Device
 
 
-def devices_list(request):
-    context = {
-        'title': 'Devices',
-        'devices': Device.objects.all()
-    }
-    return render(request, 'devices/index.html', context)
+# def devices_list(request):
+#     context = {
+#         'title': 'Devices',
+#         'devices': Device.objects.all()
+#     }
+#     return render(request, 'devices/device_list.html', context)
 
 
 def check_owner(view):
@@ -28,8 +28,9 @@ def check_owner(view):
 
 class DeviceListView(LoginReq, ListView):
     model = Device
-    template_name = 'devices/index.html'  # <app/<model>_<viewtype>.html
+    template_name = 'devices/device_list.html'  # <app/<model>_<viewtype>.html
     context_object_name = 'devices'
+    paginate_by = 3
     # ordering = ['-create_date']
 
     def get_queryset(self):
