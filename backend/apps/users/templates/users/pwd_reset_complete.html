@@ -1,0 +1,12 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+
+    <div class="alert alert-info">
+        Your password has been set!
+    </div>
+    <div class="border-top pt-3">
+        <a href="{% url 'users-login' %}">Log in again</a>
+    </div>
+
+{% endblock content %}

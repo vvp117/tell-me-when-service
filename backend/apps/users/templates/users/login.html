@@ -17,6 +17,12 @@
         </form>
             <div class="border-top pt-3">
                 <small class="text-muted">
+                    Forgot password?
+                    <a href="{% url 'password_reset' %}" class="ml-2">Reset</a>
+                </small>
+            </div>
+            <div>
+                <small class="text-muted">
                     Need an Account?
                     <a href="{% url 'users-register' %}" class="ml-2">Sign Up</a>
                 </small>

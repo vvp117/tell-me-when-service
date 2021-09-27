@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+from os import environ
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -142,3 +144,20 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 LOGIN_REDIRECT_URL = 'main-index'
 LOGIN_URL = 'users-login'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST_USER = environ.get('EMAIL_USER')
+EMAIL_HOST_PASSWORD = environ.get('EMAIL_PASS')
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# SMTP:
+#   Gmail: 'smtp.gmail.com' port=587
+#   Yandex: 'smtp.yandex.ru' port=465
+EMAIL_HOST = 'smtp.yandex.ru'
+
+# Ports:
+#   EMAIL_PORT = 587: EMAIL_USE_TLS = True and EMAIL_USE_SSL = False
+#   EMAIL_PORT = 465: EMAIL_USE_TLS = False and EMAIL_USE_SSL = True
+EMAIL_PORT = 465
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
