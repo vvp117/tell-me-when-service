@@ -46,6 +46,7 @@ class DeviceViewsTestCase(TestCase):
 
         self.url_login = reverse('users-login')
         self.url_devices = reverse('devices-list')
+
         self.paginate_by = 5
 
         self.user1: User = User.objects.get(id=1)
@@ -53,6 +54,9 @@ class DeviceViewsTestCase(TestCase):
 
         self.device_user1: Device = Device.objects.get(id=1, owner=1)
         self.device_user2: Device = Device.objects.get(id=2, owner=2)
+
+        self.url_device_user1 = reverse('devices-item', args=[1])
+        self.url_device_user2 = reverse('devices-item', args=[2])
 
 
 class DeviceListTestViews(DeviceViewsTestCase):
@@ -110,3 +114,28 @@ class DeviceListTestViews(DeviceViewsTestCase):
         self.assertIn('is_paginated', response.context)
         self.assertTrue(response.context['is_paginated'])
         self.assertEquals(len(response.context['devices']), last_devices)
+
+
+class DeviceDetailTestViews(DeviceViewsTestCase):
+
+    def test_device_without_login(self):
+        response = self.client.get(self.url_device_user1)
+
+        self.assertEquals(response.status_code, 302)
+        self.assertRedirects(response,
+                             f'{self.url_login}?next={self.url_device_user1}')
+
+    def test_device_after_login(self):
+        self.client.login(**self.user1_data)
+
+        response = self.client.get(self.url_device_user1)
+
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'devices/device_detail.html')
+
+    def test_curent_owner_device_only(self):
+        self.client.login(**self.user1_data)
+
+        response = self.client.get(self.url_device_user2)
+
+        self.assertEquals(response.status_code, 403)
