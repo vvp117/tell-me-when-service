@@ -61,6 +61,9 @@ class DeviceViewsTestCase(TestCase):
         self.url_device_user1 = reverse('devices-item', args=[1])
         self.url_device_user2 = reverse('devices-item', args=[2])
 
+        self.url_device_edit_user1 = reverse('devices-edit', args=[1])
+        self.url_device_edit_user2 = reverse('devices-edit', args=[2])
+
 
 class DeviceListTestViews(DeviceViewsTestCase):
 
@@ -79,7 +82,7 @@ class DeviceListTestViews(DeviceViewsTestCase):
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'devices/device_list.html')
 
-    def test_curent_owner_devices_only(self):
+    def test_current_owner_devices_only(self):
         self.client.login(**self.user2_data)
 
         response = self.client.get(self.url_devices)
@@ -136,7 +139,7 @@ class DeviceDetailTestViews(DeviceViewsTestCase):
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'devices/device_detail.html')
 
-    def test_curent_owner_device_only(self):
+    def test_current_owner_device_only(self):
         self.client.login(**self.user1_data)
 
         response = self.client.get(self.url_device_user2)
@@ -188,6 +191,70 @@ class DeviceCreateTestViews(DeviceViewsTestCase):
         self.assertRedirects(response, url_new_device)
 
         response = self.client.get(url_new_device)
+
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'devices/device_detail.html')
+
+
+class DeviceUpdateTestViews(DeviceViewsTestCase):
+
+    def test_device_without_login(self):
+        response = self.client.get(self.url_device_edit_user1)
+
+        self.assertEquals(response.status_code, 302)
+        self.assertRedirects(
+            response,
+            f'{self.url_login}?next={self.url_device_edit_user1}')
+
+    def test_device_after_login(self):
+        self.client.login(**self.user1_data)
+
+        response = self.client.get(self.url_device_edit_user1)
+
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'devices/device_form.html')
+
+    def test_get_current_owner_device_only(self):
+        self.client.login(**self.user1_data)
+
+        response = self.client.get(self.url_device_edit_user2)
+
+        self.assertEquals(response.status_code, 403)
+
+    def test_post_current_owner_device_only(self):
+        self.client.login(**self.user1_data)
+
+        device_data = {
+            'id': 2,
+            'name': str(uuid4()),
+            'description': 'my device',
+        }
+
+        response = self.client.post(self.url_device_edit_user2, device_data)
+
+        self.assertEquals(response.status_code, 403)
+
+    def test_update_device_success(self):
+        self.client.login(**self.user1_data)
+
+        device_data = {
+            'id': 1,
+            'name': str(uuid4()),
+            'description': 'my device',
+        }
+
+        response = self.client.post(self.url_device_edit_user1, device_data)
+
+        # Redirect correct
+        self.assertEquals(response.status_code, 302)
+        self.assertRedirects(response, self.url_device_user1)
+
+        # Saved data correct
+        device = Device.objects.get(owner=self.user1, id=1)
+        self.assertEquals(device.name, device_data['name'])
+        self.assertEquals(device.description, device_data['description'])
+
+        response = self.client.get(self.url_device_user1)
 
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'devices/device_detail.html')
