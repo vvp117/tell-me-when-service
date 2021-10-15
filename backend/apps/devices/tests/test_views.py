@@ -64,6 +64,9 @@ class DeviceViewsTestCase(TestCase):
         self.url_device_edit_user1 = reverse('devices-edit', args=[1])
         self.url_device_edit_user2 = reverse('devices-edit', args=[2])
 
+        self.url_device_del_user1 = reverse('devices-del', args=[1])
+        self.url_device_del_user2 = reverse('devices-del', args=[2])
+
 
 class DeviceListTestViews(DeviceViewsTestCase):
 
@@ -258,3 +261,47 @@ class DeviceUpdateTestViews(DeviceViewsTestCase):
 
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'devices/device_detail.html')
+
+
+class DeviceDeleteTestViews(DeviceViewsTestCase):
+
+    def test_delete_device_without_login(self):
+        response = self.client.get(self.url_device_del_user1)
+
+        self.assertEquals(response.status_code, 302)
+        self.assertRedirects(
+            response,
+            f'{self.url_login}?next={self.url_device_del_user1}')
+
+    def test_get_confirm_delete_device_after_login(self):
+        self.client.login(**self.user1_data)
+
+        response = self.client.get(self.url_device_del_user1)
+
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'devices/device_confirm_delete.html')
+
+    def test_get_confirm_delete_current_owner_device_only(self):
+        self.client.login(**self.user1_data)
+
+        response = self.client.get(self.url_device_del_user2)
+
+        self.assertEquals(response.status_code, 403)
+
+    def test_post_confirm_delete_current_owner_device_only(self):
+        self.client.login(**self.user1_data)
+
+        response = self.client.post(self.url_device_del_user2)
+
+        self.assertEquals(response.status_code, 403)
+
+    def test_delete_device_success(self):
+        self.client.login(**self.user1_data)
+
+        response = self.client.post(self.url_device_del_user1)
+
+        self.assertFalse(Device.objects.filter(id=1).exists())
+
+        # Redirect correct
+        self.assertEquals(response.status_code, 302)
+        self.assertRedirects(response, self.url_devices)
