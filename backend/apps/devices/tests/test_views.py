@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from django.test import TestCase, Client
 from django.urls import reverse
 # from django.forms import BaseForm
@@ -46,6 +48,7 @@ class DeviceViewsTestCase(TestCase):
 
         self.url_login = reverse('users-login')
         self.url_devices = reverse('devices-list')
+        self.url_device_new = reverse('devices-new')
 
         self.paginate_by = 5
 
@@ -139,3 +142,52 @@ class DeviceDetailTestViews(DeviceViewsTestCase):
         response = self.client.get(self.url_device_user2)
 
         self.assertEquals(response.status_code, 403)
+
+
+class DeviceCreateTestViews(DeviceViewsTestCase):
+
+    def test_new_device_without_login(self):
+        response = self.client.get(self.url_device_new)
+
+        self.assertEquals(response.status_code, 302)
+        self.assertRedirects(response,
+                             f'{self.url_login}?next={self.url_device_new}')
+
+    def test_new_device_after_login(self):
+        self.client.login(**self.user1_data)
+
+        response = self.client.get(self.url_device_new)
+
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'devices/device_form.html')
+
+    def test_create_device_success(self):
+        self.client.login(**self.user1_data)
+
+        device_name = str(uuid4())
+        device_data = {
+            'name': device_name,
+            'description': 'my device',
+        }
+
+        response = self.client.post(self.url_device_new, device_data)
+
+        query_set = Device.objects.filter(name=device_name)
+        self.assertTrue(query_set.exists())
+
+        # Device created
+        new_device = query_set.first()
+        url_new_device = reverse('devices-item', args=[new_device.pk])
+
+        # Saved data correct
+        self.assertEquals(new_device.owner, self.user1)
+        self.assertEquals(new_device.description, device_data['description'])
+
+        # Redirect correct
+        self.assertEquals(response.status_code, 302)
+        self.assertRedirects(response, url_new_device)
+
+        response = self.client.get(url_new_device)
+
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'devices/device_detail.html')
