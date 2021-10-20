@@ -1,0 +1,62 @@
+{% extends 'main/base.html' %}
+{% load tz %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+    <div class="btn-toolbar mb-2" role="toolbar">
+        <div class="btn-group mr-2" role="group">
+            <a class="btn btn-sm btn-primary" href="{% url 'devices-edit' device.pk %}">Edit</a>
+        </div>
+        <div class="btn-group mr-2" role="group">
+            <a class="btn btn-sm btn-danger" href="{% url 'devices-del' device.pk %}">Delete</a>
+        </div>
+        <div class="btn-group mr-2" role="group">
+            <a class="btn btn-sm btn-secondary" href="{% url 'devices-list' %}">Close</a>
+        </div>
+    </div>
+
+    <article class="card">
+        <div class="card-header">
+            <h3>{{ device.name }} ({{ device.id }})</h3>
+        </div>
+        <div class="card-body">
+            <p class="card-text">{{ device.description }}</p>
+        </div>
+        <div class="card-footer text-muted">
+            {% localtime on %}
+            {% comment %} <div><small class="card-text">Owner: {{ device.owner }}</small></div> {% endcomment %}
+            <div><small class="card-text">Created: {{ device.create_date|date:"F d, Y (H:i O)" }}</small></div>
+            {% comment %} <div><small class="card-text">Modified: {{ device.modified_date|date:"F d, Y (H:i O)" }}</small></div> {% endcomment %}
+            {% endlocaltime %}
+        </div>
+    </article>
+
+    <legend class="border-bottom mb-2 mt-3">Device images</legend>
+
+    <div class="btn-toolbar mb-2" role="toolbar">
+        <div class="btn-group mr-2" role="group">
+            <a class="btn btn-sm btn-primary" href="{% url 'devices-images-new' device.pk %}">Add</a>
+        </div>
+    </div>
+
+    {% for dev_img in device_images %}
+        <div class="card mt-2" style="width: 30rem;">
+            <img class="card-img-top" src="{{ dev_img.image.url }}" alt="No image"
+                class="rounded img-thumbnail float-right">
+            <div class="card-body">
+                <p class="card-text">{{ dev_img.description }}</p>
+                {% localtime on %}
+                <p class="card-text">
+                    <small class="text-muted">Created: {{ dev_img.create_date|date:"F d, Y H:i"}}</small>
+                </p>
+                {% endlocaltime %}
+                <a href="{% url 'devices-images-edit' device.pk dev_img.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                <a href="{{ dev_img.image.url }}" class="btn btn-sm btn-outline-secondary">Expand</a>
+                <a href="{% url 'devices-images-del' device.pk dev_img.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+            </div>
+        </div>
+    {% endfor %}
+
+{% endblock content %}
