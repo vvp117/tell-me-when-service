@@ -13,4 +13,10 @@ urlpatterns = [
          views.DeviceUpdateView.as_view(), name='devices-edit'),
     path('<int:pk>/del/',
          views.DeviceDeleteView.as_view(), name='devices-del'),
+    path('<int:device_pk>/images/new/',
+         views.DeviceImageView.as_view(), name='devices-images-new'),
+    path('<int:device_pk>/images/<int:pk>/',
+         views.DeviceImageView.as_view(), name='devices-images-edit'),
+    path('<int:device_pk>/images/<int:pk>/del/',
+         views.DeviceImageDeleteView.as_view(), name='devices-images-del'),
 ]

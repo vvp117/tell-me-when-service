@@ -1,4 +1,5 @@
-# from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.contrib.auth.mixins import (
     LoginRequiredMixin as LoginReq,
     UserPassesTestMixin as UserPass,
@@ -9,8 +10,11 @@ from django.views.generic import (
     CreateView,
     UpdateView,
     DeleteView,
+    FormView,
 )
-from .models import Device
+
+from .models import Device, DeviceImage
+from .forms import DeviceImageEditForm
 
 
 # def devices_list(request):
@@ -41,6 +45,13 @@ class DeviceListView(LoginReq, ListView):
 
 class DeviceDetailView(LoginReq, UserPass, DetailView):
     model = Device
+    template_name = 'devices/device_detail.html'
+
+    def get(self, request, *args, **kwargs):
+        device = Device.objects.get(**kwargs)
+        device_images = device.deviceimage_set.order_by('-create_date').all()
+        return render(request, self.template_name,
+                      {'device': device, 'device_images': device_images})
 
     def test_func(self):
         return check_owner(self)
@@ -69,3 +80,52 @@ class DeviceDeleteView(LoginReq, UserPass, DeleteView):
 
     def test_func(self):
         return check_owner(self)
+
+
+class DeviceImageView(LoginReq, UserPass, FormView):
+    model = DeviceImage
+    fields = ['image', 'description']
+    template_name = 'devices/deviceimage_form.html'
+
+    @property
+    def device(self):
+        return get_object_or_404(Device, pk=self.kwargs['device_pk'])
+
+    @property
+    def instance(self):
+        pk = self.kwargs.get('pk')
+        if pk:
+            return get_object_or_404(DeviceImage, pk=pk)
+
+    def get(self, request, *args, **kwargs):
+        form = DeviceImageEditForm(
+            instance=self.instance,
+            initial={'device': self.device})
+
+        return render(request, self.template_name,
+                      {'form': form, 'device': self.device})
+
+    def post(self, request, *args, **kwargs):
+        form = DeviceImageEditForm(request.POST, request.FILES,
+                                   instance=self.instance)
+        if form.is_valid():
+            form.save()
+            return redirect('devices-item', self.device.pk)
+
+        return render(request, self.template_name,
+                      {'form': form, 'device': self.device})
+
+    def test_func(self):
+        return self.device.owner == self.request.user
+
+
+class DeviceImageDeleteView(LoginReq, UserPass, DeleteView):
+    model = DeviceImage
+
+    def test_func(self):
+        instance = self.get_object()
+        return instance.device.owner == self.request.user
+
+    def get_success_url(self):
+        instance = self.get_object()
+        return reverse('devices-item', kwargs={"pk": instance.device.pk})
